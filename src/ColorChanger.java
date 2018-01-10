@@ -20,19 +20,28 @@ public class ColorChanger {
         float [] hsb;
         int newRGB;
 
-
         for (int y = 0; y < height; y++){
             for (int x = 0; x < width; x++){
                 // grab the RGB value of a pixel at x,y coord in the image
                 int rgb = raw.getRGB(x, y);
-                // extract the red value
-                int red = ((rgb >> 16) & 000000000000000011111111);
-                // extract the green value
-                int green = ((rgb >> 24) & 000000000000000011111111);
                 // extract the blue value
-                int blue = ((rgb >> 32) & 000000000000000011111111); //000000000000000000000000
-                // use Color.RGBtoHSB() method to convert RBG to HSV
-                hsb = Color.RGBtoHSB(red,green,blue,null);
+                int blue = ((rgb >> 0) & 0xff); // 0b000000000000000000000000
+                // extract the green value
+                int green = ((rgb >> 8) & 0xff); //0xff
+                // extract the red value
+                int red = ((rgb >> 16) & 0xff); // 0b000000000000000011111111
+                // extract the alpha value
+                int alph = ((rgb >> 24) & 0xff); // 0b000000000000000011111111
+
+                // convert the original RGB values to have all the same
+                // mean values, so that it will be gray scale
+                int greyR;
+                int greyG;
+                int greyB;
+                greyB = greyG = greyR = (red + green + blue)/3;
+
+                // use Color.RGBtoHSB() method to convert RBG to HSB
+                hsb = Color.RGBtoHSB(greyR,greyG,greyB,null); //hsb = Color.RGBtoHSB(red,green,blue,null);
                 float old_hue = hsb[0];
                 float old_sat = hsb[1];
                 float old_brt = hsb[2];
@@ -47,6 +56,7 @@ public class ColorChanger {
                     System.out.println("Old Red was: " + red);
                     System.out.println("Old Green was: " + green);
                     System.out.println("Old BLue was: " + blue);
+                    System.out.println("Old Alpha was: " + alph);
                     // their HSB values are then:
                     System.out.println("Hue is: " + hsb[0]);
                     System.out.println("Sat is: " + hsb[1]);
@@ -64,9 +74,7 @@ public class ColorChanger {
                 //----------------------------------------------------------------------
                 }
             }
-
         }
         ImageIO.write(processed, "PNG", new File("processed.png"));
     }
-
 }
